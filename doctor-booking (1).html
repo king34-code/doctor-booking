@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediBook – Doctor Appointment Booking</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:      #0a7b6e;
+      --teal-light:#e6f4f2;
+      --teal-mid:  #c2e4e0;
+      --ink:       #1a2328;
+      --muted:     #556670;
+      --bg:        #f7fafa;
+      --white:     #ffffff;
+      --danger:    #c0392b;
+      --radius:    12px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ─────────────────────────────────── */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--teal-mid);
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--teal);
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--ink); }
+    nav a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-left: 28px;
+      font-weight: 500;
+    }
+    nav a:hover { color: var(--teal); }
+
+    /* ── HERO ────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--teal) 0%, #0d9b8b 100%);
+      color: white;
+      text-align: center;
+      padding: 72px 24px 80px;
+    }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      font-size: 1.05rem;
+      opacity: 0.88;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .pulse-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      display: block;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.12); }
+    }
+
+    /* ── MAIN LAYOUT ─────────────────────────────── */
+    .container {
+      max-width: 860px;
+      margin: -40px auto 60px;
+      padding: 0 20px;
+    }
+
+    /* ── CARD ────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 40px 44px;
+    }
+    .card-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: var(--teal);
+      margin-bottom: 6px;
+    }
+    .card-sub {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 32px;
+    }
+
+    /* ── FORM GRID ───────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+    }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 7px;
+    }
+    input, select, textarea {
+      padding: 11px 14px;
+      border: 1.5px solid #d0dce0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--ink);
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-light);
+    }
+    textarea { resize: vertical; min-height: 90px; }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23556670' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+    /* ── REQUIRED STAR ───────────────────────────── */
+    .req { color: var(--danger); margin-left: 2px; }
+
+    /* ── SUBMIT BUTTON ───────────────────────────── */
+    .btn-submit {
+      margin-top: 28px;
+      width: 100%;
+      padding: 15px;
+      background: var(--teal);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-submit:hover  { background: #09705f; }
+    .btn-submit:active { transform: scale(0.98); }
+
+    /* ── SUCCESS MESSAGE ─────────────────────────── */
+    .success {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .success-icon {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .success h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+      color: var(--teal);
+      margin-bottom: 10px;
+    }
+    .success p { color: var(--muted); line-height: 1.6; }
+    .success-detail {
+      margin-top: 24px;
+      background: var(--teal-light);
+      border-radius: 10px;
+      padding: 20px 24px;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    .success-detail strong { color: var(--teal); }
+    .btn-new {
+      margin-top: 24px;
+      padding: 11px 28px;
+      background: transparent;
+      border: 2px solid var(--teal);
+      color: var(--teal);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-new:hover { background: var(--teal); color: white; }
+
+    /* ── INFO STRIP ──────────────────────────────── */
+    .info-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .info-box {
+      background: var(--teal-light);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+    }
+    .info-box .icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .info-box h4 { font-size: 0.9rem; font-weight: 600; color: var(--teal); margin-bottom: 4px; }
+    .info-box p  { font-size: 0.82rem; color: var(--muted); line-height: 1.4; }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      border-top: 1px solid var(--teal-mid);
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 600px) {
+      header { padding: 16px 20px; }
+      nav a  { margin-left: 16px; }
+      .card  { padding: 28px 20px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .info-strip { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Medi<span>Book</span></div>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Our Doctors</a>
+    <a href="#">Contact</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="pulse-icon">🩺</span>
+  <h1>Book Your Appointment<br>Quickly & Easily</h1>
+  <p>Fill in the form below and our team will confirm your slot within 24 hours.</p>
+</div>
+
+<!-- BOOKING FORM -->
+<div class="container">
+  <div class="card">
+    <div id="formSection">
+      <h2 class="card-title">Appointment Request</h2>
+      <p class="card-sub">Fields marked <span class="req">*</span> are required.</p>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>First Name <span class="req">*</span></label>
+          <input type="text" id="firstName" placeholder="e.g. Aisha" />
+        </div>
+
+        <div class="form-group">
+          <label>Last Name <span class="req">*</span></label>
+          <input type="text" id="lastName" placeholder="e.g. Khan" />
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number <span class="req">*</span></label>
+          <input type="tel" id="phone" placeholder="+1 555 000 0000" />
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="you@email.com" />
+        </div>
+
+        <div class="form-group">
+          <label>Preferred Date <span class="req">*</span></label>
+          <input type="date" id="date" />
+        </div>
+
+        <div class="form-group">
+          <label>Preferred Time <span class="req">*</span></label>
+          <select id="time">
+            <option value="">— Select a time —</option>
+            <option>09:00 AM</option>
+            <option>10:00 AM</option>
+            <option>11:00 AM</option>
+            <option>12:00 PM</option>
+            <option>02:00 PM</option>
+            <option>03:00 PM</option>
+            <option>04:00 PM</option>
+            <option>05:00 PM</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Doctor / Specialist</label>
+          <select id="doctor">
+            <option value="">— Any available —</option>
+            <option>Dr. Sarah Malik – General Physician</option>
+            <option>Dr. Omar Siddiqui – Cardiologist</option>
+            <option>Dr. Priya Nair – Dermatologist</option>
+            <option>Dr. James Obi – Paediatrician</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Visit Type</label>
+          <select id="visitType">
+            <option>In-person</option>
+            <option>Video call</option>
+            <option>Phone call</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label>Reason for Visit</label>
+          <textarea id="reason" placeholder="Briefly describe your symptoms or what you'd like to discuss…"></textarea>
+        </div>
+
+      </div>
+
+      <button class="btn-submit" onclick="submitForm()">Confirm Appointment →</button>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div class="success" id="successSection">
+      <span class="success-icon">✅</span>
+      <h2>Appointment Requested!</h2>
+      <p>Thank you. Our team will review your request and send a confirmation shortly.</p>
+      <div class="success-detail" id="summaryBox"></div>
+      <button class="btn-new" onclick="resetForm()">Book Another Appointment</button>
+    </div>
+  </div>
+
+  <!-- INFO BOXES -->
+  <div class="info-strip">
+    <div class="info-box">
+      <div class="icon">⏱️</div>
+      <h4>Fast Confirmation</h4>
+      <p>We confirm your slot within 24 hours of your request.</p>
+    </div>
+    <div class="info-box">
+      <div class="icon">🔒</div>
+      <h4>Private & Secure</h4>
+      <p>Your personal and medical details stay confidential.</p>
+    </div>
+    <div class="info-box">
+      <div class="icon">📱</div>
+      <h4>Flexible Visits</h4>
+      <p>Choose in-person, video, or phone — whatever suits you.</p>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 MediBook · Built for learning purposes · All rights reserved</footer>
+
+<script>
+  // Set minimum date to today
+  document.getElementById('date').min = new Date().toISOString().split('T')[0];
+
+  function submitForm() {
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName  = document.getElementById('lastName').value.trim();
+    const phone     = document.getElementById('phone').value.trim();
+    const date      = document.getElementById('date').value;
+    const time      = document.getElementById('time').value;
+
+    // Simple validation
+    if (!firstName || !lastName || !phone || !date || !time) {
+      alert('Please fill in all required fields (marked with *).');
+      return;
+    }
+
+    const doctor    = document.getElementById('doctor').value    || 'Any available doctor';
+    const visitType = document.getElementById('visitType').value || 'In-person';
+    const reason    = document.getElementById('reason').value.trim() || 'Not specified';
+    const email     = document.getElementById('email').value.trim()  || 'Not provided';
+
+    // Show confirmation summary
+    document.getElementById('summaryBox').innerHTML = `
+      <strong>📋 Booking Summary</strong><br><br>
+      <b>Patient:</b> ${firstName} ${lastName}<br>
+      <b>Phone:</b> ${phone}<br>
+      <b>Email:</b> ${email}<br>
+      <b>Date:</b> ${new Date(date + 'T00:00:00').toDateString()}<br>
+      <b>Time:</b> ${time}<br>
+      <b>Doctor:</b> ${doctor}<br>
+      <b>Visit Type:</b> ${visitType}<br>
+      <b>Reason:</b> ${reason}
+    `;
+
+    document.getElementById('formSection').style.display = 'none';
+    document.getElementById('successSection').style.display = 'block';
+  }
+
+  function resetForm() {
+    document.getElementById('formSection').style.display = 'block';
+    document.getElementById('successSection').style.display = 'none';
+    // Clear fields
+    ['firstName','lastName','phone','email','date','reason'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('time').selectedIndex   = 0;
+    document.getElementById('doctor').selectedIndex = 0;
+  }
+</script>
+</body>
+</html>
